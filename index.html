@@ -84,10 +84,14 @@
         textSizer.style.fontSize = window.getComputedStyle(element).fontSize;
         textSizer.textContent = element.textContent;
 
-        while (textSizer.offsetWidth > maxWidth) {
-            const currentSize = parseFloat(window.getComputedStyle(element).fontSize);
-            element.style.fontSize = `${currentSize - 1}px`;
-            textSizer.style.fontSize = element.style.fontSize;
+        if (textSizer.offsetWidth > maxWidth) {
+            while (textSizer.offsetWidth > maxWidth) {
+                const currentSize = parseFloat(window.getComputedStyle(element).fontSize);
+                element.style.fontSize = `${currentSize - 1}px`;
+                textSizer.style.fontSize = element.style.fontSize;
+            }
+        } else {
+            element.style.fontSize = '30px';
         }
     }
 
