@@ -37,6 +37,13 @@
             text-overflow: ellipsis;
             text-align: left;
         }
+        #textSizer {
+            position: absolute;
+            visibility: hidden;
+            white-space: nowrap;
+            font-family: 'DIN Alternate', Arial, sans-serif;
+            font-size: 30px;
+        }
     </style>
 </head>
 <body>
@@ -44,6 +51,7 @@
 <div id="rssFeed">
     <div id="eventTitle" class="event-title">Välkommen till Eskilstuna</div>
 </div>
+<div id="textSizer"></div>
 
 <script>
     const rssUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://visiteskilstuna.se/download/18.5fc312621939037cb26166d6/1733518839518/events_feed%20(3).xml');
@@ -51,6 +59,7 @@
     let events = [];
     let currentEventIndex = 0;
     let eventInterval;
+    const maxWidth = 600; // Max bredd i pixlar för texten
 
     const monthMap = { "jan": 1, "feb": 2, "mar": 3, "apr": 4, "maj": 5, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "okt": 10, "nov": 11, "dec": 12 };
 
@@ -70,13 +79,15 @@
         return '';
     }
 
-    function adjustFontSize(element, maxLength, baseFontSize = 30) {
-        const text = element.textContent.trim();
-        if (text.length > maxLength) {
-            const scaleFactor = Math.max(maxLength / text.length, 1);
-            element.style.fontSize = `${baseFontSize * scaleFactor}px`;
-        } else {
-            element.style.fontSize = `${baseFontSize}px`;
+    function adjustFontSize(element, maxWidth) {
+        const textSizer = document.getElementById('textSizer');
+        textSizer.style.fontSize = window.getComputedStyle(element).fontSize;
+        textSizer.textContent = element.textContent;
+
+        while (textSizer.offsetWidth > maxWidth) {
+            const currentSize = parseFloat(window.getComputedStyle(element).fontSize);
+            element.style.fontSize = `${currentSize - 1}px`;
+            textSizer.style.fontSize = element.style.fontSize;
         }
     }
 
@@ -123,7 +134,7 @@
             const currentEvent = events[currentEventIndex];
             eventTitle.textContent = currentEvent.title;
 
-            adjustFontSize(eventTitle, 31);
+            adjustFontSize(eventTitle, maxWidth);
 
             currentEventIndex = (currentEventIndex + 1) % events.length;
         } else {
@@ -134,7 +145,7 @@
     function resetToWelcomeMessage() {
         const eventTitle = document.getElementById("eventTitle");
         eventTitle.textContent = 'Välkommen till Eskilstuna';
-        adjustFontSize(eventTitle, 31);
+        adjustFontSize(eventTitle, maxWidth);
     }
 
     fetchRSS();
